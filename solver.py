@@ -387,7 +387,7 @@ class Game:
 						numownfields += 1
 
 				#print(totaldist/numownfields)
-				score += 10/(totaldist/numownfields)
+				score += 5/(totaldist/numownfields)
 				scorelist.append(score)
 
 		if debug:
