@@ -13,11 +13,12 @@ LEFT: [-1,1,0]
 }
 
 class Field:
-	def __init__(self, board, coords, xycoords, color=None):
+	def __init__(self, board, coords, xycoords, index, color=None):
 		self.board = board
 		self.coords = coords
-		self.color = color
 		self.xycoords = xycoords
+		self.index = index
+		self.color = color
 
 	def to(self, direction):
 		delta = deltas[direction]
@@ -49,6 +50,8 @@ class Game:
 
 		self.xcoord = [0,-1,-2,-3,-4,-4,-4,-4,-4]
 		self.ycoord = [4,4,4,4,4,3,2,1,0]
+
+		index = 0
 		for y in range(9):
 			for x in range(self.rowlength[y]):
 				coords = [self.xcoord[y]+x,self.ycoord[y]-x,-4+y]
@@ -59,7 +62,8 @@ class Game:
 					color = 0
 				elif y in [7,8] or (y == 6 and x in [2,3,4]):
 					color = 1
-				self.board.append(Field(self.board, coords, [x,y], color))
+				self.board.append(Field(self.board, coords, [x,y], index, color))
+				index += 1
 
 
 	def at(self, x, y):
@@ -76,7 +80,12 @@ class Game:
 				index += 1
 			print("")
 
-	def print(self, dist=False):
+	def print(self, mode=0):
+		"""Modes:
+		0 - normal
+		1 - distance
+		2 - index
+		"""
 		s = ""
 		index = 0
 		center = self.at(4,4)
@@ -85,13 +94,19 @@ class Game:
 			for x in range(self.rowlength[y]):
 				field = self.board[index]
 				col = field.color
-				if col is None:
-					col = "-"
+				indexnames = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+				if mode == 3:
+					col = indexnames[index]
 				else:
-					if dist:
-						col = str(center.distance(field))
+					if col is None:
+						col = "-"
 					else:
-						col = str(col)
+						if mode == 0:
+							col = str(col)
+						elif mode == 1:
+							col = str(center.distance(field))
+						elif mode == 2:
+							col = indexnames[index]#str(index)
 				s += " "+col
 				index += 1
 			s += "\n"

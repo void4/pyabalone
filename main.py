@@ -66,6 +66,7 @@ def npcgame():
 		#if round % 100 == 0:
 			#print(result)
 		game.print()
+		game.print(mode=0)
 		if result[0]:
 			round += 1
 
