@@ -3,6 +3,15 @@ from copy import deepcopy
 
 UPLEFT,UPRIGHT,RIGHT,DOWNRIGHT,DOWNLEFT,LEFT = range(6)
 
+DIRECTIONS = {
+"upleft ul":UPLEFT,
+"upright ur":UPRIGHT,
+"right r":RIGHT,
+"downright dr":DOWNRIGHT,
+"downleft dl":DOWNLEFT,
+"left l":LEFT
+}
+
 deltas = {
 UPLEFT: [0,1,-1],
 UPRIGHT: [1,0,-1],
@@ -12,12 +21,33 @@ DOWNLEFT: [-1,0,1],
 LEFT: [-1,1,0]
 }
 
+ROWLENGTH = [5,6,7,8,9,8,7,6,5]
+XCOORD = [0,-1,-2,-3,-4,-4,-4,-4,-4]
+YCOORD = [4,4,4,4,4,3,2,1,0]
+
+INDEXNAMES = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxy"
+
+INDEXCOORDS = {}
+
+x = 0
+y = 0
+for i, n in enumerate(INDEXNAMES):
+	INDEXCOORDS[n] = [x,y]
+	if x == ROWLENGTH[y] - 1:
+		x = 0
+		y += 1
+	else:
+		x += 1
+
+#print(INDEXCOORDS)
+
 class Field:
 	def __init__(self, board, coords, xycoords, index, color=None):
 		self.board = board
 		self.coords = coords
 		self.xycoords = xycoords
 		self.index = index
+		self.name = list(INDEXCOORDS.keys())[list(INDEXCOORDS.values()).index(xycoords)]
 		self.color = color
 
 	def to(self, direction):
@@ -33,7 +63,7 @@ class Field:
 		return s//2
 
 	def __repr__(self):
-		return str(self.xycoords) + ":" + str(self.color)
+		return str(self.name) + " " + str(self.xycoords) + ":" + str(self.color)
 
 
 class Game:
@@ -46,15 +76,10 @@ class Game:
 		self.board = []
 		self.out = Counter()
 
-		self.rowlength = [5,6,7,8,9,8,7,6,5]
-
-		self.xcoord = [0,-1,-2,-3,-4,-4,-4,-4,-4]
-		self.ycoord = [4,4,4,4,4,3,2,1,0]
-
 		index = 0
 		for y in range(9):
-			for x in range(self.rowlength[y]):
-				coords = [self.xcoord[y]+x,self.ycoord[y]-x,-4+y]
+			for x in range(ROWLENGTH[y]):
+				coords = [XCOORD[y]+x,YCOORD[y]-x,-4+y]
 				#print(coords)
 				assert sum(coords) == 0
 				color = None
@@ -65,6 +90,8 @@ class Game:
 				self.board.append(Field(self.board, coords, [x,y], index, color))
 				index += 1
 
+	def atname(self, n):
+		return self.at(*INDEXCOORDS[n])
 
 	def at(self, x, y):
 		fields = [field for field in self.board if field.xycoords == [x,y]]
@@ -75,12 +102,12 @@ class Game:
 	def printcoords(self):
 		index = 0
 		for y in range(9):
-			for x in range(self.rowlength[y]):
+			for x in range(ROWLENGTH[y]):
 				print(self.board[index].coords, end=" ")
 				index += 1
 			print("")
 
-	def print(self, mode=0):
+	def __repr__(self, mode=0):
 		"""Modes:
 		0 - normal
 		1 - distance
@@ -90,13 +117,13 @@ class Game:
 		index = 0
 		center = self.at(4,4)
 		for y in range(9):
-			s += " " * (9 - self.rowlength[y])
-			for x in range(self.rowlength[y]):
+			s += " " * (9 - ROWLENGTH[y])
+			for x in range(ROWLENGTH[y]):
 				field = self.board[index]
 				col = field.color
-				indexnames = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+				
 				if mode == 3:
-					col = indexnames[index]
+					col = INDEXNAMES[index]
 				else:
 					if col is None:
 						col = "-"
@@ -106,11 +133,15 @@ class Game:
 						elif mode == 1:
 							col = str(center.distance(field))
 						elif mode == 2:
-							col = indexnames[index]#str(index)
+							col = INDEXNAMES[index]#str(index)
 				s += " "+col
 				index += 1
 			s += "\n"
-		print(s, end="")
+		
+		return s
+
+	def print(self, mode=0):
+		print(self.__repr__(mode), end="")
 		print(self.out)
 		print("Next color is: ", self.next_color)
 
@@ -224,7 +255,7 @@ class Game:
 		for axis in axes:
 			for i, start in enumerate(axis[2]):
 				fields = [self.at(start[0], start[1])]
-				for c in range(self.rowlength[i]-1):
+				for c in range(ROWLENGTH[i]-1):
 					fields.append(fields[-1].to(axis[0]))
 
 				sublists = self.get_repeats(fields)
@@ -360,6 +391,9 @@ class Game:
 			print(Counter(scorelist))
 		#randomize a bit, in case of same scores?
 		bestmove = sortedmoves[scorelist.index(max(scorelist))]
+		if debug:
+			#print(bestmove)
+			print(bestmove[0], list(DIRECTIONS.keys())[bestmove[1]])
 		result = self.move(*bestmove[:2])
 		return result
 

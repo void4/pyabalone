@@ -1,4 +1,4 @@
-from solver import Game, UPLEFT,UPRIGHT,RIGHT,DOWNRIGHT,DOWNLEFT,LEFT
+from solver import Game, DIRECTIONS, UPLEFT,UPRIGHT,RIGHT,DOWNRIGHT,DOWNLEFT,LEFT
 from random import choice
 
 
@@ -61,11 +61,11 @@ def npcgame():
 			#result = game.randommove()
 			result = game.aimove()
 		else:
-			result = game.aimove()
+			result = game.aimove(debug=True)
 
 		#if round % 100 == 0:
 			#print(result)
-		game.print()
+		#game.print()
 		game.print(mode=0)
 		if result[0]:
 			round += 1
@@ -80,6 +80,65 @@ def test():
 	print(len(list(game.move_gen())))
 	print(game.move([game.at(2,2), game.at(3,2), game.at(4,2)], DOWNRIGHT))
 	game.print()
+	game.print(mode=3)
 
-npcgame()
+def sidebyside(a,b,spacing=3):
+	spacing = " " * spacing
+	a = a.split("\n")
+	b = b.split("\n")
+	maxlinelen = max([len(line) for line in a])
+	for i,line in enumerate(a):
+		print(line + " " * (maxlinelen-len(line)) + b[i])
+
+def pvsnpcgame():
+	game = Game()
+	game.print()
+	game.print(mode=3)
+	round = 0
+	colors = [0,1]
+	while not game.is_over():
+		if round % 2 == 0:
+			while True:
+				try:
+					inp = input(">")
+					inp = inp.split()
+					if "," in inp[0]:
+						fields = [game.atname(n) for n in inp[0].split(",")]
+					else:
+						fields = game.atname(inp[0])
+					
+					for k, v in DIRECTIONS.items():
+						if inp[1].lower() in k.split():
+							direction = v
+							break
+						
+					move = [fields, direction]
+					result = game.move(*move)
+					if result[0]:
+						break
+					else:
+						print(result)
+				except Exception as e:
+					print(e)
+		else:
+			result = game.aimove(debug=True)
+
+		#if round % 100 == 0:
+			#print(result)
+		#game.print()
+		#game.print(mode=0)
+		#game.print(mode=3)
+		sidebyside(game.__repr__(mode=0), game.__repr__(mode=3))
+		if result[0]:
+			round += 1
+		else:
+			notice = "ball out" if result[2] else "e"
+			print(result)
+
+	print(game.out)
+	print(round)
+
+pvsnpcgame()
+#npcgame()
 #allinitmoves()
+#test()
