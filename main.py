@@ -92,8 +92,9 @@ def sidebyside(a,b,spacing=3):
 
 def pvsnpcgame():
 	game = Game()
-	game.print()
-	game.print(mode=3)
+	#game.print()
+	#game.print(mode=3)
+	sidebyside(game.__repr__(mode=0), game.__repr__(mode=3))
 	round = 0
 	colors = [0,1]
 	while not game.is_over():
