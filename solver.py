@@ -96,8 +96,8 @@ class Game:
 				index += 1
 			s += "\n"
 		print(s, end="")
-		#print(self.out)
-		#print("Next color is: ", self.next_color)
+		print(self.out)
+		print("Next color is: ", self.next_color)
 
 	def is_valid_move(self, field, direction, color=None, debug=False):
 		if color is None:

@@ -79,5 +79,6 @@ def test():
 	print(len(list(game.move_gen())))
 	print(game.move([game.at(2,2), game.at(3,2), game.at(4,2)], DOWNRIGHT))
 	game.print()
-#npcgame()
-allinitmoves()
+
+npcgame()
+#allinitmoves()
