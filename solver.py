@@ -121,7 +121,7 @@ class Game:
 			for x in range(ROWLENGTH[y]):
 				field = self.board[index]
 				col = field.color
-				
+
 				if mode == 3:
 					col = INDEXNAMES[index]
 				else:
@@ -137,13 +137,14 @@ class Game:
 				s += " "+col
 				index += 1
 			s += "\n"
-		
+
 		return s
 
-	def print(self, mode=0):
+	def print(self, mode=0, stats=True):
 		print(self.__repr__(mode), end="")
-		print(self.out)
-		print("Next color is: ", self.next_color)
+		if stats:
+			print(self.out)
+			print("Next color is: ", self.next_color)
 
 	def is_valid_move(self, field, direction, color=None, debug=False):
 		if color is None:
@@ -251,17 +252,19 @@ class Game:
 		[DOWNRIGHT, [LEFT, RIGHT, DOWNLEFT, UPRIGHT], [[0,4],[0,3],[0,2],[0,1],[0,0],[1,0],[2,0],[3,0],[4,0]]],
 		[DOWNLEFT, [LEFT, RIGHT, DOWNRIGHT, UPLEFT], [[0,0],[1,0],[2,0],[3,0],[4,0],[5,1],[6,2],[7,3], [8,4]]]
 		]
-
+		# TODO SCHIEBEN NACH RECHTSUNTEN!, 9,F dr
 		for axis in axes:
 			for i, start in enumerate(axis[2]):
 				fields = [self.at(start[0], start[1])]
 				for c in range(ROWLENGTH[i]-1):
 					fields.append(fields[-1].to(axis[0]))
 
-				sublists = self.get_repeats(fields)
+				# if this is not a list, reordering for direction and for sublist changes from 38 to 44!?
+				sublists = list(self.get_repeats(fields))
 
 				for direction in axis[1]:
 					for sublist in sublists:
+						#print(sublist)
 						ivm = self.is_valid_move(sublist, direction)
 						if ivm[0]:
 							yield sublist, direction, ivm[1]

@@ -46,10 +46,10 @@ def allinitmoves():
 		#print(move)
 		result = game.move(*move[:2])
 		#print(result)
-		game.print()
+		game.print(stats=False)
 		print("")
 
-	#print(nummoves)
+	print(nummoves)
 
 def npcgame():
 	game = Game()
@@ -78,9 +78,9 @@ def test():
 	game.printcoords()
 	game.print()
 	print(len(list(game.move_gen())))
-	print(game.move([game.at(2,2), game.at(3,2), game.at(4,2)], DOWNRIGHT))
-	game.print()
-	game.print(mode=3)
+	#print(game.move([game.at(2,2), game.at(3,2), game.at(4,2)], DOWNRIGHT))
+	#game.print()
+	#game.print(mode=3)
 
 def sidebyside(a,b,spacing=3):
 	spacing = " " * spacing
@@ -107,12 +107,12 @@ def pvsnpcgame():
 						fields = [game.atname(n) for n in inp[0].split(",")]
 					else:
 						fields = game.atname(inp[0])
-					
+
 					for k, v in DIRECTIONS.items():
 						if inp[1].lower() in k.split():
 							direction = v
 							break
-						
+
 					move = [fields, direction]
 					result = game.move(*move)
 					if result[0]:
@@ -139,7 +139,7 @@ def pvsnpcgame():
 	print(game.out)
 	print(round)
 
-pvsnpcgame()
-#npcgame()
+#pvsnpcgame()
+npcgame()
 #allinitmoves()
 #test()
