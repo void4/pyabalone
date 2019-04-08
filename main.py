@@ -35,19 +35,21 @@ def smart_move():
 
 def allinitmoves():
 	game = Game()
-	game.print()
-	game.printcoords()
+	#game.print()
+	#game.printcoords()
 	nummoves = len(list(game.move_gen(0)))
-	print(nummoves)
+	#print(nummoves)
 	for i in range(nummoves):
 		game = Game()
 		moves = list(game.move_gen(0))
 		move = moves[i]
-		print(move[0].coords, move[0].xycoords, move[1])
-		print(game.move(*move))
+		#print(move)
+		result = game.move(*move[:2])
+		#print(result)
 		game.print()
+		print("")
 
-	print(nummoves)
+	#print(nummoves)
 
 def npcgame():
 	game = Game()
@@ -74,5 +76,8 @@ def test():
 	game = Game()
 	game.printcoords()
 	game.print()
-
-npcgame()
+	print(len(list(game.move_gen())))
+	print(game.move([game.at(2,2), game.at(3,2), game.at(4,2)], DOWNRIGHT))
+	game.print()
+#npcgame()
+allinitmoves()

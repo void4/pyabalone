@@ -96,8 +96,8 @@ class Game:
 				index += 1
 			s += "\n"
 		print(s, end="")
-		print(self.out)
-		print("Next color is: ", self.next_color)
+		#print(self.out)
+		#print("Next color is: ", self.next_color)
 
 	def is_valid_move(self, field, direction, color=None, debug=False):
 		if color is None:
@@ -105,13 +105,15 @@ class Game:
 		# Side move
 		if isinstance(field, list):
 			for subfield in field:
+				if debug:
+					print(color, subfield.color)
 				if subfield.color != color:
 					return False, "Invalid color for side move"
 				target = subfield.to(direction)
 				if target is None:
 					return False, "Can't make side move outside of board"
 				if target.color is not None:
-					return False, "Can't make side move on enemy piece"
+					return False, "Can't make side move on other piece"
 
 			return True, False
 
@@ -199,31 +201,46 @@ class Game:
 
 		#x,y format
 		axes = [
-		[[RIGHT, LEFT], [[0,0],[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[0,8]]],
-		[[DOWNRIGHT, UPLEFT], [[0,4],[0,3],[0,2],[0,1],[0,0],[1,0],[2,0],[3,0],[4,0]]],
-		[[DOWNLEFT, UPRIGHT], [[0,0],[1,0],[2,0],[3,0],[4,0],[5,1],[6,2],[7,3], [8,4]]]
+		[RIGHT, [DOWNLEFT, DOWNRIGHT, UPLEFT, UPRIGHT], [[0,0],[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[0,8]]],
+		[DOWNRIGHT, [LEFT, RIGHT, DOWNLEFT, UPRIGHT], [[0,4],[0,3],[0,2],[0,1],[0,0],[1,0],[2,0],[3,0],[4,0]]],
+		[DOWNLEFT, [LEFT, RIGHT, DOWNRIGHT, UPLEFT], [[0,0],[1,0],[2,0],[3,0],[4,0],[5,1],[6,2],[7,3], [8,4]]]
 		]
+
 		for axis in axes:
-			for i, start in enumerate(axis[1]):
+			for i, start in enumerate(axis[2]):
 				fields = [self.at(start[0], start[1])]
 				for c in range(self.rowlength[i]-1):
-					fields.append(fields[-1].to(axis[0][0]))
+					fields.append(fields[-1].to(axis[0]))
 
 				sublists = self.get_repeats(fields)
 
-				for direction in axis[0]:
+				for direction in axis[1]:
 					for sublist in sublists:
-						if self.is_valid_move(sublist, direction)[0]:
-							yield fields, direction, ivm[1]
+						ivm = self.is_valid_move(sublist, direction)
+						if ivm[0]:
+							yield sublist, direction, ivm[1]
+						#else:
+						#	print(sublist, direction, ivm)
+
+	def next_player(self):
+		self.next_color = 0 if self.next_color == 1 else 1
 
 	def move(self, field, direction):
 		if isinstance(field, Field):
 			color = field.color
 		else:
 			color = field[0].color
+
 		ivm = self.is_valid_move(field, direction, color, debug=False)
 		if not ivm[0]:
 			return ivm
+
+		if isinstance(field, list):
+			for f in field:
+				f.color = None
+				f.to(direction).color = color
+			self.next_player()
+			return True, "Done"
 
 		fields = [field]
 		while True:
@@ -245,7 +262,7 @@ class Game:
 
 		fields[0].color = None
 
-		self.next_color = 0 if self.next_color == 1 else 1
+		self.next_player()
 
 		return True, "Done"
 
@@ -264,7 +281,7 @@ class Game:
 		else:
 			raise Exception("Translation Error")
 
-	def aimove(self):
+	def aimove(self, debug=False):
 		from random import random
 		MAXNODES = 1000
 		#print("AI", self.next_color)
@@ -324,7 +341,8 @@ class Game:
 				score += 10/(totaldist/numownfields)
 				scorelist.append(score)
 
-		print(Counter(scorelist))
+		if debug:
+			print(Counter(scorelist))
 		#randomize a bit, in case of same scores?
 		bestmove = sortedmoves[scorelist.index(max(scorelist))]
 		result = self.move(*bestmove[:2])
