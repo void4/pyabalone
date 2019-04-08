@@ -27,6 +27,10 @@ class Field:
 				return field
 		return None
 
+	def distance(self, field):
+		s = abs(self.coords[0]-field.coords[0])+abs(self.coords[1]-field.coords[1])+abs(self.coords[2]-field.coords[2])
+		return s//2
+
 	def __repr__(self):
 		return str(self.xycoords) + ":" + str(self.color)
 
@@ -72,17 +76,22 @@ class Game:
 				index += 1
 			print("")
 
-	def print(self):
+	def print(self, dist=False):
 		s = ""
 		index = 0
+		center = self.at(4,4)
 		for y in range(9):
 			s += " " * (9 - self.rowlength[y])
 			for x in range(self.rowlength[y]):
-				col = self.board[index].color
+				field = self.board[index]
+				col = field.color
 				if col is None:
 					col = "-"
 				else:
-					col = str(col)
+					if dist:
+						col = str(center.distance(field))
+					else:
+						col = str(col)
 				s += " "+col
 				index += 1
 			s += "\n"
@@ -299,10 +308,25 @@ class Game:
 
 				score += recurse(subgame)
 
+				center = subgame.at(4, 4)
+
+				totaldist = 0
+				numownfields = 0
+				# Score positions
+				for field in subgame.board:
+					#or only evaluate at leafs of tree?
+					if field.color == self.next_color:
+						# calculate distance from center
+						totaldist += center.distance(field)
+						numownfields += 1
+
+				#print(totaldist/numownfields)
+				score += 10/(totaldist/numownfields)
 				scorelist.append(score)
 
-		print(scorelist)
-		bestmove = sortedmoves[scorelist.index(max(scorelist))]#randomize a bit, in case of same scores?
+		print(Counter(scorelist))
+		#randomize a bit, in case of same scores?
+		bestmove = sortedmoves[scorelist.index(max(scorelist))]
 		result = self.move(*bestmove[:2])
 		return result
 

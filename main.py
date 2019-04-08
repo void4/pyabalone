@@ -49,26 +49,30 @@ def allinitmoves():
 
 	print(nummoves)
 
-game = Game()
-game.print()
-round = 0
-colors = [0,1]
-while not game.is_over():
-	if round % 2 == 0:
-		#result = game.randommove()
-		result = game.aimove()
-	else:
-		result = game.aimove()
-
-	#if round % 100 == 0:
-		#print(result)
+def npcgame():
+	game = Game()
 	game.print()
-	if result[0]:
-		round += 1
+	round = 0
+	colors = [0,1]
+	while not game.is_over():
+		if round % 2 == 0:
+			#result = game.randommove()
+			result = game.aimove()
+		else:
+			result = game.aimove()
 
-print(game.out)
-print(round)
-#smart_move()
-#print(game.move(game.at(0,0),DOWNRIGHT))
-#game.print()
-game.printcoords()
+		#if round % 100 == 0:
+			#print(result)
+		game.print()
+		if result[0]:
+			round += 1
+
+	print(game.out)
+	print(round)
+
+def test():
+	game = Game()
+	game.printcoords()
+	game.print()
+
+npcgame()
