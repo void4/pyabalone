@@ -50,26 +50,19 @@ def test():
 	#game.print()
 	#game.print(mode=3)
 
-def pvsnpcgame():
+def pvsnpcgame(premoves=None):
 	game = Game()
 	#game.print()
 	#game.print(mode=3)
 
-
-	premoves = """
-	0 dl
-	5 dl
-	B dl
-	Q dr
-	Z dr
-	"""
-	for line in premoves.split("\n"):
-		line = line.strip()
-		if len(line) == 0:
-			continue
-		print(line)
-		game.move(*game.move_from_str(line))
-		game.aimove()
+	if isinstance(premoves, str):
+		for line in premoves.split("\n"):
+			line = line.strip()
+			if len(line) == 0:
+				continue
+			print(line)
+			game.move(*game.move_from_str(line))
+			game.aimove()
 
 	game.printsbs()
 	round = 0
@@ -106,8 +99,17 @@ def pvsnpcgame():
 	print(game.out)
 	print(round)
 
+premoves = """
+0 dl
+5 dl
+B dl
+Q dr
+Z dr
+"""
+
 if __name__ == "__main__":
 	pvsnpcgame()
+	#pvsnpcgame(premoves)
 #npcgame()
 #allinitmoves()
 #test()
