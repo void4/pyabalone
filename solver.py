@@ -171,8 +171,11 @@ class Game:
 
 
 	def is_valid_move(self, field, direction, color=None, debug=False):
+		"""!!! Use is_valid_move()[0] !!!"""
+		
 		if color is None:
 			color = self.next_color
+			
 		# Side move
 		if isinstance(field, list):
 			for subfield in field:
@@ -188,9 +191,8 @@ class Game:
 
 			return True, False
 
-		"""!!! Use is_valid_move()[0] !!!"""
-		#sideway moves :/
-
+		
+		# Forward move
 		if color != self.next_color:
 			return False, "Not your (%s) turn, it's %i turn" % (str(color), self.next_color)
 
@@ -217,6 +219,8 @@ class Game:
 			if nextfield.color is None:
 				break
 			elif nextfield.color == color:
+				if enemyfields > 0:
+					return False, "Cannot move own balls behind enemy balls"
 				ownfields += 1
 			else:
 				enemyfields += 1
