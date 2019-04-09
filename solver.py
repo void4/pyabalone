@@ -414,7 +414,8 @@ class Game:
 
 				#print(totaldist/numownfields)
 				locationbonus = 2/(totaldist/numownfields)
-				print(score, locationbonus)
+				if debug:
+					print(score, locationbonus)
 				score += locationbonus
 				scorelist.append(score)
 

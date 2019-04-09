@@ -116,7 +116,7 @@ def pvsnpcgame():
 				except Exception as e:
 					print(e)
 		else:
-			result = game.aimove(debug=True)
+			result = game.aimove(debug=False)
 
 		#if round % 100 == 0:
 			#print(result)
