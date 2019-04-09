@@ -1,37 +1,5 @@
-from solver import Game, DIRECTIONS, UPLEFT,UPRIGHT,RIGHT,DOWNRIGHT,DOWNLEFT,LEFT
+from solver import Game
 from random import choice
-
-
-"""
-84 total initial moves?
-
--> 42 per team, lets check (symmetry?)
-"""
-
-def smart_move():
-	mycolor = 0
-
-	movelist = list(game.move_gen(0))
-
-	validmovelist = []
-	for move in movelist:
-		ivm = game.is_valid_move(*move, mycolor)
-		if ivm[0]:
-			validmovelist.append([move, ivm])
-
-	# Choose random move that results in enemy loss
-	enemylossmoves = [move for move in validmovelist if move[1][1]]
-	if len(enemylossmoves) > 0:
-		move = choice(enemylossmoves)[0]
-	else:
-		# Choose random move
-		move = choice(validmovelist)[0]
-
-	#print(move[0].coords, move[1])
-	y = move[0].coords[1] + 4
-	x = move[0].coords[0] - game.xcoord[y]
-	print("Y:", y, "X:", x, "DIR", move[1])
-	game.move(*move)
 
 def allinitmoves():
 	game = Game()
@@ -82,32 +50,37 @@ def test():
 	#game.print()
 	#game.print(mode=3)
 
-
-
 def pvsnpcgame():
 	game = Game()
 	#game.print()
 	#game.print(mode=3)
+
+
+	premoves = """
+	0 dl
+	5 dl
+	B dl
+	Q dr
+	Z dr
+	"""
+	for line in premoves.split("\n"):
+		line = line.strip()
+		if len(line) == 0:
+			continue
+		print(line)
+		game.move(*game.move_from_str(line))
+		game.aimove()
+
 	game.printsbs()
 	round = 0
 	colors = [0,1]
+
 	while not game.is_over():
-		if round % 2 == 0:
+		if game.next_color == 0:
 			while True:
 				try:
 					inp = input(">")
-					inp = inp.split()
-					if "," in inp[0]:
-						fields = [game.atname(n) for n in inp[0].split(",")]
-					else:
-						fields = game.atname(inp[0])
-
-					for k, v in DIRECTIONS.items():
-						if inp[1].lower() in k.split():
-							direction = v
-							break
-
-					move = [fields, direction]
+					move = game.move_from_str(inp)
 					result = game.move(*move)
 					if result[0]:
 						break

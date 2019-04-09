@@ -344,6 +344,24 @@ class Game:
 	def is_over(self):
 		return 6 in self.out.values()
 
+	def move_from_str(self, inp):
+		inp = inp.split()
+		if "," in inp[0]:
+			fields = [self.atname(n) for n in inp[0].split(",")]
+		else:
+			fields = self.atname(inp[0])
+
+		direction = None
+		for k, v in DIRECTIONS.items():
+			if inp[1].lower() in k.split():
+				direction = v
+				break
+
+		if direction is None:
+			return None
+		move = [fields, direction]
+		return move
+
 	def translate(self, fields):
 		"""Translates fields from other game into this game"""
 		if isinstance(fields, Field):
@@ -378,15 +396,13 @@ class Game:
 					submoves = sorted(list(subgame.move_gen()), key=lambda m:random())
 					for submove in sorted(submoves, key=lambda m:m[2], reverse=True)[:2]:
 							if submove[2]:
-								score += 2**(1-depth)
+								score += 2**(-1-depth)/len(submoves)
 
 							subgame2 = deepcopy(game)
 							subgame2.move(subgame2.translate(submove[0]), submove[1])
-
+							# normalize added score by number of moves
 							if depth < 0:#1:
 								score += recurse(game, depth+1)
-
-
 
 			return score
 
