@@ -65,6 +65,22 @@ class Field:
 	def __repr__(self):
 		return str(self.name) + " " + str(self.xycoords) + ":" + str(self.color)
 
+def sidebyside(a,b,spacing=3):
+	spacing = " " * spacing
+	a = a.split("\n")
+	b = b.split("\n")
+	maxlinelen = max([len(line) for line in a])
+	lines = []
+	if len(b) > len(a):
+		print("Skipping b side lines!")
+		
+	for i,line in enumerate(a):
+		newline = line + " " * (maxlinelen-len(line))
+		if len(b) > i:
+			newline += b[i]
+		lines.append(newline)
+	
+	return "\n".join(lines)
 
 class Game:
 
@@ -99,6 +115,12 @@ class Game:
 			return None
 		return fields[0]
 
+	def sbs(self):
+		return sidebyside(self.__repr__(mode=0), self.__repr__(mode=3, stats=False))
+
+	def printsbs(self):
+		print(self.sbs())
+
 	def printcoords(self):
 		index = 0
 		for y in range(9):
@@ -107,7 +129,7 @@ class Game:
 				index += 1
 			print("")
 
-	def __repr__(self, mode=0):
+	def __repr__(self, mode=0, stats=True):
 		"""Modes:
 		0 - normal
 		1 - distance
@@ -138,13 +160,15 @@ class Game:
 				index += 1
 			s += "\n"
 
+		if stats:
+			s += "Out: " + " ".join([str(k)*v for k,v in self.out.items()]) + "\n"
+			s += "Next color is: %i" % self.next_color
+
 		return s
 
 	def print(self, mode=0, stats=True):
-		print(self.__repr__(mode), end="")
-		if stats:
-			print(self.out)
-			print("Next color is: ", self.next_color)
+		print(self.__repr__(mode, stats), end="")
+
 
 	def is_valid_move(self, field, direction, color=None, debug=False):
 		if color is None:
@@ -171,8 +195,11 @@ class Game:
 			return False, "Not your (%s) turn, it's %i turn" % (str(color), self.next_color)
 
 		if color is None:
-			return False, "Can't move nothing"
+			return False, "Can't move nothing (outside of board)"
 
+		if field.color is None:
+			return False, "Can't move nothing"
+		
 		if field.color != color:
 			return False, "Can't move enemy ball"
 
@@ -252,7 +279,6 @@ class Game:
 		[DOWNRIGHT, [LEFT, RIGHT, DOWNLEFT, UPRIGHT], [[0,4],[0,3],[0,2],[0,1],[0,0],[1,0],[2,0],[3,0],[4,0]]],
 		[DOWNLEFT, [LEFT, RIGHT, DOWNRIGHT, UPLEFT], [[0,0],[1,0],[2,0],[3,0],[4,0],[5,1],[6,2],[7,3], [8,4]]]
 		]
-		# TODO SCHIEBEN NACH RECHTSUNTEN!, 9,F dr
 		for axis in axes:
 			for i, start in enumerate(axis[2]):
 				fields = [self.at(start[0], start[1])]
@@ -339,12 +365,12 @@ class Game:
 		scorelist = []
 
 		def recurse(game, depth=0):
-			#print(depth	)
+			#print(depth)
 			score = 0
 			moves = sorted(list(game.move_gen()), key=lambda m:random())
 			for move in sorted(moves, key=lambda m:m[2], reverse=True)[:2]:
 					if move[2]:
-						score -= 1#increase loss value if it loses the game!
+						score -= 2#increase loss value if it loses the game!
 
 					subgame = deepcopy(game)
 					subgame.move(subgame.translate(move[0]), move[1])
@@ -352,7 +378,7 @@ class Game:
 					submoves = sorted(list(subgame.move_gen()), key=lambda m:random())
 					for submove in sorted(submoves, key=lambda m:m[2], reverse=True)[:2]:
 							if submove[2]:
-								score += 1
+								score += 2**(1-depth)
 
 							subgame2 = deepcopy(game)
 							subgame2.move(subgame2.translate(submove[0]), submove[1])
@@ -367,7 +393,7 @@ class Game:
 		for submove in sortedmoves:
 				score = 0
 				if submove[2]:
-					score += 1
+					score += 2
 
 				subgame = deepcopy(self)
 				subgame.move(subgame.translate(submove[0]), submove[1])
@@ -387,7 +413,9 @@ class Game:
 						numownfields += 1
 
 				#print(totaldist/numownfields)
-				score += 5/(totaldist/numownfields)
+				locationbonus = 2/(totaldist/numownfields)
+				print(score, locationbonus)
+				score += locationbonus
 				scorelist.append(score)
 
 		if debug:

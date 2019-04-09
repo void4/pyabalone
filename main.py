@@ -82,19 +82,13 @@ def test():
 	#game.print()
 	#game.print(mode=3)
 
-def sidebyside(a,b,spacing=3):
-	spacing = " " * spacing
-	a = a.split("\n")
-	b = b.split("\n")
-	maxlinelen = max([len(line) for line in a])
-	for i,line in enumerate(a):
-		print(line + " " * (maxlinelen-len(line)) + b[i])
+
 
 def pvsnpcgame():
 	game = Game()
 	#game.print()
 	#game.print(mode=3)
-	sidebyside(game.__repr__(mode=0), game.__repr__(mode=3))
+	game.printsbs()
 	round = 0
 	colors = [0,1]
 	while not game.is_over():
@@ -129,7 +123,7 @@ def pvsnpcgame():
 		#game.print()
 		#game.print(mode=0)
 		#game.print(mode=3)
-		sidebyside(game.__repr__(mode=0), game.__repr__(mode=3))
+		game.printsbs()
 		if result[0]:
 			round += 1
 		else:
@@ -139,7 +133,8 @@ def pvsnpcgame():
 	print(game.out)
 	print(round)
 
-#pvsnpcgame()
-npcgame()
+if __name__ == "__main__":
+	pvsnpcgame()
+#npcgame()
 #allinitmoves()
 #test()
