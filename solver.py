@@ -174,8 +174,8 @@ class Game:
 			s += "\n"
 
 		if stats:
-			s += "Out: " + " ".join([str(k)*v for k,v in self.out.items()]) + "\n"
-			s += "Next color is: %i" % self.next_color
+			s += "Out: " + " ".join([(colortable.get(k, str(k))+" ")*v for k,v in self.out.items()]) + "\n"
+			s += "Next color is: %s" % (colortable.get(self.next_color, str(self.next_color))+" ")
 
 		return s
 
@@ -431,7 +431,7 @@ class Game:
 		for submove in sortedmoves:
 				score = 0
 				if submove[2]:
-					score += 2
+					score += 20
 
 				subgame = deepcopy(self)
 				subgame.move(subgame.translate(submove[0]), submove[1])
@@ -441,7 +441,9 @@ class Game:
 				center = subgame.at(4, 4)
 
 				totaldist = 0
+				enemydist = 0
 				numownfields = 0
+				numenemyfields = 0
 				# Score positions
 				for field in subgame.board:
 					#or only evaluate at leafs of tree?
@@ -449,12 +451,15 @@ class Game:
 						# calculate distance from center
 						totaldist += center.distance(field)
 						numownfields += 1
-
+					elif field.color != None:#if it's the enemy
+						enemydist += center.distance(field)
+						numenemyfields += 1
 				#print(totaldist/numownfields)
 				locationbonus = 2/(totaldist/numownfields)
+				locationmalus = 30/(enemydist/numenemyfields)
 				if debug:
-					print(score, locationbonus)
-				score += locationbonus
+					print(score, locationbonus, locationmalus)
+				score += locationbonus - locationmalus
 				scorelist.append(score)
 
 		if debug:
