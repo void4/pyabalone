@@ -68,37 +68,41 @@ def pvsnpcgame(premoves=None):
 	round = 0
 	colors = [0,1]
 
-	while not game.is_over():
-		if game.next_color == 0:
-			while True:
-				try:
-					inp = input(">")
-					move = game.move_from_str(inp)
-					result = game.move(*move)
-					if result[0]:
-						break
-					else:
-						print(result)
-				except Exception as e:
-					print(e)
-		else:
-			result = game.aimove(debug=False)
+	try:
+		while not game.is_over():
+			if game.next_color == 0:
+				while True:
+					try:
+						inp = input(">")
+						move = game.move_from_str(inp)
+						result = game.move(*move)
+						if result[0]:
+							break
+						else:
+							print(result)
+					except Exception as e:
+						print(e)
+			else:
+				result = game.aimove(debug=False)
 
-		#if round % 100 == 0:
-			#print(result)
-		#game.print()
-		#game.print(mode=0)
-		#game.print(mode=3)
-		game.printsbs()
-		if result[0]:
-			round += 1
-		else:
-			notice = "ball out" if result[2] else "e"
-			print(result)
+			#if round % 100 == 0:
+				#print(result)
+			#game.print()
+			#game.print(mode=0)
+			#game.print(mode=3)
+			game.printsbs()
+			if result[0]:
+				round += 1
+			else:
+				notice = "ball out" if result[2] else "e"
+				print(result)
+
+	except KeyboardInterrupt:
+		pass
+	print(game.backup_history())
 
 	print(game.out)
 	print(round)
-	print(game.backup_history())
 
 
 def npcvsnpcgame(premoves=None):
@@ -119,22 +123,24 @@ def npcvsnpcgame(premoves=None):
 	round = 0
 	colors = [0,1]
 
-	while not game.is_over():
-		result = game.aimove(debug=False)
-		print(game.backup_history())
-		#if round % 100 == 0:
-			#print(result)
-		#game.print()
-		#game.print(mode=0)
-		#game.print(mode=3)
-		game.printsbs()
-		if result[0]:
-			round += 1
-		else:
-			notice = "ball out" if result[2] else "e"
-			print(result)
-
-	print(game.out)
+	try:
+		while not game.is_over():
+			result = game.aimove(debug=False)
+			print(game.backup_history())
+			#if round % 100 == 0:
+				#print(result)
+			#game.print()
+			#game.print(mode=0)
+			#game.print(mode=3)
+			game.printsbs()
+			if result[0]:
+				round += 1
+			else:
+				notice = "ball out" if result[2] else "e"
+				print(result)
+	except KeyboardInterrupt:
+		pass
+	print(game.backup_history())
 	print(round)
 
 premoves = """
@@ -146,8 +152,8 @@ Z dr
 """
 
 if __name__ == "__main__":
-	npcvsnpcgame()
-	#pvsnpcgame()
+	#npcvsnpcgame()
+	pvsnpcgame()
 	#pvsnpcgame(premoves)
 #npcgame()
 #allinitmoves()
