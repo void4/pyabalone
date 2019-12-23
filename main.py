@@ -98,6 +98,44 @@ def pvsnpcgame(premoves=None):
 
 	print(game.out)
 	print(round)
+	print(game.backup_history())
+
+
+def npcvsnpcgame(premoves=None):
+	game = Game()
+	#game.print()
+	#game.print(mode=3)
+
+	if isinstance(premoves, str):
+		for line in premoves.split("\n"):
+			line = line.strip()
+			if len(line) == 0:
+				continue
+			print(line)
+			game.move(*game.move_from_str(line))
+			game.aimove()
+
+	game.printsbs()
+	round = 0
+	colors = [0,1]
+
+	while not game.is_over():
+		result = game.aimove(debug=False)
+		print(game.backup_history())
+		#if round % 100 == 0:
+			#print(result)
+		#game.print()
+		#game.print(mode=0)
+		#game.print(mode=3)
+		game.printsbs()
+		if result[0]:
+			round += 1
+		else:
+			notice = "ball out" if result[2] else "e"
+			print(result)
+
+	print(game.out)
+	print(round)
 
 premoves = """
 0 dl
@@ -108,7 +146,8 @@ Z dr
 """
 
 if __name__ == "__main__":
-	pvsnpcgame()
+	npcvsnpcgame()
+	#pvsnpcgame()
 	#pvsnpcgame(premoves)
 #npcgame()
 #allinitmoves()

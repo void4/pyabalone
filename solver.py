@@ -12,6 +12,8 @@ DIRECTIONS = {
 "left l":LEFT
 }
 
+I_DIRECTIONS = {v:k for k,v in DIRECTIONS.items()}
+
 deltas = {
 UPLEFT: [0,1,-1],
 UPRIGHT: [1,0,-1],
@@ -73,13 +75,13 @@ def sidebyside(a,b,spacing=3):
 	lines = []
 	if len(b) > len(a):
 		print("Skipping b side lines!")
-		
+
 	for i,line in enumerate(a):
 		newline = line + " " * (maxlinelen-len(line))
 		if len(b) > i:
 			newline += b[i]
 		lines.append(newline)
-	
+
 	return "\n".join(lines)
 
 class Game:
@@ -91,6 +93,8 @@ class Game:
 
 		self.board = []
 		self.out = Counter()
+
+		self.history = []
 
 		index = 0
 		for y in range(9):
@@ -131,13 +135,20 @@ class Game:
 
 	def __repr__(self, mode=0, stats=True):
 		"""Modes:
-		0 - normal
+		0 - unicode
 		1 - distance
 		2 - index
+		3 - normal (numbers only)
 		"""
 		s = ""
 		index = 0
 		center = self.at(4,4)
+
+		colortable = {
+			0: "●",#"⚪",
+			1: "○",#"⚫"
+		}
+
 		for y in range(9):
 			s += " " * (9 - ROWLENGTH[y])
 			for x in range(ROWLENGTH[y]):
@@ -151,11 +162,13 @@ class Game:
 						col = "-"
 					else:
 						if mode == 0:
-							col = str(col)
+							col = colortable.get(col, str(col))
 						elif mode == 1:
 							col = str(center.distance(field))
 						elif mode == 2:
 							col = INDEXNAMES[index]#str(index)
+						elif mode == 3:
+							col = str(col)
 				s += " "+col
 				index += 1
 			s += "\n"
@@ -172,10 +185,10 @@ class Game:
 
 	def is_valid_move(self, field, direction, color=None, debug=False):
 		"""!!! Use is_valid_move()[0] !!!"""
-		
+
 		if color is None:
 			color = self.next_color
-			
+
 		# Side move
 		if isinstance(field, list):
 			for subfield in field:
@@ -191,7 +204,7 @@ class Game:
 
 			return True, False
 
-		
+
 		# Forward move
 		if color != self.next_color:
 			return False, "Not your (%s) turn, it's %i turn" % (str(color), self.next_color)
@@ -201,7 +214,7 @@ class Game:
 
 		if field.color is None:
 			return False, "Can't move nothing"
-		
+
 		if field.color != color:
 			return False, "Can't move enemy ball"
 
@@ -343,7 +356,12 @@ class Game:
 
 		self.next_player()
 
+		self.history.append(",".join([f.name for f in fields]) + " " + I_DIRECTIONS[direction])
+
 		return True, "Done"
+
+	def backup_history(self):
+		return "\n".join(self.history)
 
 	def is_over(self):
 		return 6 in self.out.values()
