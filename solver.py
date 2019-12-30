@@ -470,7 +470,7 @@ class Game:
 			#print(bestmove)
 			print(bestmove[0], list(DIRECTIONS.keys())[bestmove[1]])
 		result = self.move(*bestmove[:2])
-		return result
+		return bestmove, result
 
 	def randommove(self):
 		from random import choice
