@@ -84,9 +84,32 @@ def sidebyside(a,b,spacing=3):
 
 	return "\n".join(lines)
 
+def layoutColor(layout, x, y, index):
+	color = None
+	if layout is None:
+		if y in [0,1] or (y == 2 and x in [2,3,4]):
+			color = 0
+		elif y in [7,8] or (y == 6 and x in [2,3,4]):
+			color = 1
+	else:
+		"""
+		blacks, whites = layout.split(":")
+		if INDEXNAMES[index] in blacks:
+			color = 0
+		elif INDEXNAMES[index] in whites:
+			color = 1
+		"""
+		print(len(layout), index)
+		if layout[index] == "0":
+			color = 0
+		elif layout[index] == "1":
+			color = 1
+
+	return color
+
 class Game:
 
-	def __init__(self):#n players?
+	def __init__(self, layout=None):#n players?
 		# Cube coordinates
 		# https://www.redblobgames.com/grids/hexagons/
 		self.next_color = 0
@@ -102,12 +125,8 @@ class Game:
 				coords = [XCOORD[y]+x,YCOORD[y]-x,-4+y]
 				#print(coords)
 				assert sum(coords) == 0
-				color = None
-				if y in [0,1] or (y == 2 and x in [2,3,4]):
-					color = 0
-				elif y in [7,8] or (y == 6 and x in [2,3,4]):
-					color = 1
-				self.board.append(Field(self.board, coords, [x,y], index, color))
+
+				self.board.append(Field(self.board, coords, [x,y], index, layoutColor(layout, x, y, index)))
 				index += 1
 
 	def atname(self, n):
