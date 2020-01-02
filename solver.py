@@ -84,26 +84,13 @@ def sidebyside(a,b,spacing=3):
 
 	return "\n".join(lines)
 
-def layoutColor(layout, x, y, index):
+def layoutColor(layout, index):
 	color = None
-	if layout is None:
-		if y in [0,1] or (y == 2 and x in [2,3,4]):
-			color = 0
-		elif y in [7,8] or (y == 6 and x in [2,3,4]):
-			color = 1
-	else:
-		"""
-		blacks, whites = layout.split(":")
-		if INDEXNAMES[index] in blacks:
-			color = 0
-		elif INDEXNAMES[index] in whites:
-			color = 1
-		"""
-		print(len(layout), index)
-		if layout[index] == "0":
-			color = 0
-		elif layout[index] == "1":
-			color = 1
+
+	if layout[index] == "0":
+		color = 0
+	elif layout[index] == "1":
+		color = 1
 
 	return color
 
@@ -115,9 +102,16 @@ class Game:
 		self.next_color = 0
 
 		self.board = []
-		self.out = Counter()
+		self.out = {0:0, 1:0}
 
 		self.history = []
+
+		if layout is None:
+			layout = "00000000000--000-----------------------------111--111111111110"
+
+		self.setup(layout)
+
+	def setup(self, layout):
 
 		index = 0
 		for y in range(9):
@@ -126,8 +120,25 @@ class Game:
 				#print(coords)
 				assert sum(coords) == 0
 
-				self.board.append(Field(self.board, coords, [x,y], index, layoutColor(layout, x, y, index)))
+				self.board.append(Field(self.board, coords, [x,y], index, layoutColor(layout, index)))
 				index += 1
+
+		self.next_color = 0 if layout[-1] == "0" else 1
+		self.out = {
+			0: 14-layout[:-1].count("0"),
+			1: 14-layout[:-1].count("1")
+		}
+
+	def getLayout(self):
+		layout = ""
+		for field in self.board:
+			if field.color is None:
+				layout += "-"
+			else:
+				layout += str(field.color)
+
+		layout += str(self.next_color)
+		return layout
 
 	def atname(self, n):
 		return self.at(*INDEXCOORDS[n])
